@@ -31,7 +31,7 @@ def simulate_games(game_class, ai_algo1, ai_algo2, num_games):
     p1_avg_time = 0
     p2_avg_time = 0
     for i in range(num_games):
-        start_player = i % 2 + 1
+        start_player = 1
         winner, p1_avg_game_time, p2_avg_game_time = play_game(game_class, ai_algo1, ai_algo2, start_player)
         p1_avg_time += p1_avg_game_time
         p2_avg_time += p2_avg_game_time

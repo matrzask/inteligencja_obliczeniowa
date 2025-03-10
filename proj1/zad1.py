@@ -3,8 +3,8 @@ from ClumsyConnectFour import ClumsyConnectFour
 from ConnectFour import ConnectFour
 from Simulate import simulate_games
 
-num_games = 20
-depths = [(4, 4), (4, 6), (6, 6)]
+num_games = 10
+depths = [(4, 4), (4, 8), (8, 8)]
 
 print("Deterministic Connect Four:")
 for depth1, depth2 in depths:

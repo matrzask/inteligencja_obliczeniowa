@@ -1,7 +1,7 @@
 from easyAI import AI_Player, Human_Player
-from ConnectFour import ConnectFour
-from NegamaxNoAlphaBeta import NegamaxNoAlphaBeta
+from ClumsyConnectFour import ClumsyConnectFour
+from ExpectiMinimax import ExpectiMinimax
 
-ai = NegamaxNoAlphaBeta(4)
-game = ConnectFour([Human_Player(), AI_Player(ai)])
+ai = ExpectiMinimax(4)
+game = ClumsyConnectFour([Human_Player(), AI_Player(ai)])
 game.play()

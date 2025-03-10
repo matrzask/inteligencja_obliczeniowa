@@ -10,17 +10,32 @@ class ClumsyConnectFour(TwoPlayerGame):
     def possible_moves(self):
         return [ i for i in range(7) if (self.board[0][i] == 0)]
 
-    def make_move(self, column):
-        shifts = [0]
-        if column > 0 and self.board[0][column - 1] == 0:
-            shifts.append(-1)
-        if column < 6 and self.board[0][column + 1] == 0:
-            shifts.append(1)
-        column += random.choice(shifts)
+    def random_moves(self, move):
+        moves = [move]
+        if move > 0 and self.board[0][move - 1] == 0:
+            moves.append(move-1)
+        if move < 6 and self.board[0][move + 1] == 0:
+            moves.append(move+1)
+        return moves
+
+    def make_move(self, move):
+        column = random.choice(self.random_moves(move))
 
         for i in range(5, -1, -1):
             if self.board[i][column] == 0:
                 self.board[i][column] = self.current_player
+                break
+    
+    def force_move(self, move):
+        for i in range(5, -1, -1):
+            if self.board[i][move] == 0:
+                self.board[i][move] = self.current_player
+                break
+
+    def undo_forced_move(self, move):
+        for i in range(6):
+            if self.board[i][move] != 0:
+                self.board[i][move] = 0
                 break
     
     def lose(self):
