@@ -3,14 +3,14 @@ from aipython.stripsProblem import Strips, STRIPS_domain, Planning_problem
 def move(p, l1, l2):
     return 'move_'+p+'_from_'+l1+'_to_'+l2
 
-def at(e):
+def at(e): # location of player or monster
     return e+'_at'
 
-def border(l1,l2):
+def border(l1,l2): # defines if player can move from l1 to l2
     (l1,l2) = (l2,l1) if l1 > l2 else (l1,l2) # to make relation symmetrical
     return l1+'_border_'+l2
 
-def guarded(l1):
+def guarded(l1): # defines if monster is guarding location l1
     return l1+'_guarded'
 
 def attack(p, m, l1, l2):
