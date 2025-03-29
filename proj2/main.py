@@ -1,4 +1,6 @@
-from aipython.stripsProblem import Strips, STRIPS_domain, Planning_problem
+from stripsProblem import Strips, STRIPS_domain, Planning_problem
+from searchMPP import SearcherMPP
+from stripsForwardPlanner import Forward_STRIPS
 
 def move(p, l1, l2):
     return 'move_'+p+'_from_'+l1+'_to_'+l2
@@ -90,11 +92,23 @@ def create_world(players, monsters, locations):
 
     return STRIPS_domain(feature_domain_dict, stmap)
     
+def forward_noheuristic(problem):
+    print("\n***** FORWARD NO HEURISTIC")
+    path = SearcherMPP(Forward_STRIPS(problem)).search()
+    actions = []
+    while path.arc is not None:
+        actions.append(path.arc.action)
+        path = path.initial
+    actions.reverse()
+    {print(a) for a in actions}
+
 world1 = create_world({'player'}, {'spider'}, {'forest','cave','dungeon'})
 problem1 = Planning_problem(world1,
                             {at('player'):'forest', at('spider'):'dungeon',
                              border('forest','cave'):True, border('cave','dungeon'):True, border('dungeon','forest'):False,
                              guarded('forest'):False, guarded('cave'):False, guarded('dungeon'):True,
+                             has_stone('forest'):False, has_wood('forest'):True, has_stone('cave'):True, has_wood('cave'):False, has_stone('dungeon'):False, has_wood('dungeon'):False,
                              has_stone('player'):False, has_wood('player'):False, has_pickaxe('player'):False, has_sword('player'):False}, #initial state
                              {at('player'):'dungeon'}) #goal
 
+forward_noheuristic(problem1)
