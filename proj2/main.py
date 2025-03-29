@@ -91,7 +91,27 @@ def create_world(players, monsters, locations):
     feature_domain_dict.update({has_sword(p):boolean for p in players})
 
     return STRIPS_domain(feature_domain_dict, stmap)
-    
+
+def borders_helper(locations, borders): #borders is a set of tuples, returns a dictionary with all locations pairs as keys and True if they are bordering, False otherwise
+    border_dict = {}
+    for l1 in locations:
+        for l2 in locations:
+            if l1 < l2:
+                border_dict[border(l1, l2)] = (l1, l2) in borders or (l2, l1) in borders
+    return border_dict
+
+def locations_stone_helper(locations, locations_stone): #locations_stone is a set of locations, returns a dictionary with all locations as keys and True if they have stone, False otherwise
+    stone_dict = {}
+    for l in locations:
+        stone_dict[has_stone(l)] = l in locations_stone
+    return stone_dict
+
+def locations_wood_helper(locations, locations_wood): #locations_wood is a set of locations, returns a dictionary with all locations as keys and True if they have wood, False otherwise
+    wood_dict = {}
+    for l in locations:
+        wood_dict[has_wood(l)] = l in locations_wood
+    return wood_dict
+
 def forward_noheuristic(problem):
     print("\n***** FORWARD NO HEURISTIC")
     path = SearcherMPP(Forward_STRIPS(problem)).search()
@@ -111,4 +131,18 @@ problem1 = Planning_problem(world1,
                              has_stone('player'):False, has_wood('player'):False, has_pickaxe('player'):False, has_sword('player'):False}, #initial state
                              {at('player'):'dungeon'}) #goal
 
-forward_noheuristic(problem1)
+locations = {'forest','cave','dungeon','field','mountain','tower'}
+world2 = create_world({'player1', 'player2'}, {'spider', 'zombie', 'skeleton'}, locations)
+borders = borders_helper(locations, {('forest','cave'),('cave','dungeon'),('forest','field'),('field','mountain'),('mountain','tower'),('cave','mountain')})
+problem2 = Planning_problem(world2,
+                            {at('player1'):'forest', at('player2'):'field', at('spider'):'dungeon', at('zombie'):'mountain', at('skeleton'):'tower',
+                             **borders,
+                             guarded('forest'):False, guarded('cave'):False, guarded('dungeon'):True, guarded('field'):False, guarded('mountain'):True, guarded('tower'):True,
+                             **locations_stone_helper(locations, {'cave','mountain'}), **locations_wood_helper(locations, {'forest'}),
+                             has_stone('player1'):False, has_wood('player1'):False, has_pickaxe('player1'):False, has_sword('player1'):False,
+                             has_stone('player2'):False, has_wood('player2'):False, has_pickaxe('player2'):False, has_sword('player2'):False},
+                            {at('player1'):'dungeon', at('player2'):'tower'})
+                             
+                             
+
+forward_noheuristic(problem2)
