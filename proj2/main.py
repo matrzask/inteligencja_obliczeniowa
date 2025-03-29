@@ -1,6 +1,7 @@
 from stripsProblem import Strips, STRIPS_domain, Planning_problem
 from searchMPP import SearcherMPP
 from stripsForwardPlanner import Forward_STRIPS
+import time
 
 def move(p, l1, l2):
     return 'move_'+p+'_from_'+l1+'_to_'+l2
@@ -122,6 +123,44 @@ def forward_noheuristic(problem):
     actions.reverse()
     {print(a) for a in actions}
 
+def forward_heuristic(problem, heuristic):
+    print("\n***** FORWARD HEURISTIC")
+    path = SearcherMPP(Forward_STRIPS(problem,heuristic)).search()
+    actions = []
+    while path.arc is not None:
+        actions.append(path.arc.action)
+        path = path.initial
+    actions.reverse()
+    {print(a) for a in actions}
+
+def dist(loc1, loc2, state):
+    if loc1 == loc2:
+        return 0
+    
+    score = 1
+    if not state[border(loc1, loc2)]:
+        score += 1
+    if state[guarded(loc2)]:
+        score += 1
+    
+    return score
+
+def h1(state, goal): #doesn't work well, longer than no heuristic
+    score = 0
+    for s in state:
+        if s.endswith('_has_pickaxe') and state[s] == False:
+            score += 1
+        if s.endswith('_has_sword') and state[s] == False:
+            score += 1
+    return score
+
+def h2(state, goal):
+    score = 0
+    for g in goal:
+        if g.endswith('_at'):
+            score += dist(state[g], goal[g], state)
+    return score
+
 world1 = create_world({'player'}, {'spider'}, {'forest','cave','dungeon'})
 problem1 = Planning_problem(world1,
                             {at('player'):'forest', at('spider'):'dungeon',
@@ -143,6 +182,15 @@ problem2 = Planning_problem(world2,
                              has_stone('player2'):False, has_wood('player2'):False, has_pickaxe('player2'):False, has_sword('player2'):False},
                             {at('player1'):'dungeon', at('player2'):'tower'})
                              
-                             
 
+start_time = time.time()
 forward_noheuristic(problem2)
+end_time = time.time()
+
+print(f"Execution time: {end_time - start_time} seconds")
+
+start_time = time.time()
+forward_heuristic(problem2, h2)
+end_time = time.time()
+
+print(f"Execution time: {end_time - start_time} seconds")
