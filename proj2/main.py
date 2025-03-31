@@ -113,23 +113,27 @@ def locations_wood_helper(locations, locations_wood): #locations_wood is a set o
         wood_dict[has_wood(l)] = l in locations_wood
     return wood_dict
 
-def forward_noheuristic(problem):
+def forward_noheuristic(problem): #returns final state
     path = SearcherMPP(Forward_STRIPS(problem)).search()
+    final_state = path.end().assignment
     actions = []
     while path.arc is not None:
         actions.append(path.arc.action)
         path = path.initial
     actions.reverse()
     {print(a) for a in actions}
+    return final_state
 
 def forward_heuristic(problem, heuristic):
     path = SearcherMPP(Forward_STRIPS(problem,heuristic)).search()
+    final_state = path.end().assignment
     actions = []
     while path.arc is not None:
         actions.append(path.arc.action)
         path = path.initial
     actions.reverse()
     {print(a) for a in actions}
+    return final_state
 
 def dist(loc1, loc2, state):
     if loc1 == loc2:
@@ -143,20 +147,12 @@ def dist(loc1, loc2, state):
     
     return score
 
-def h1(state, goal): #doesn't work well, longer than no heuristic
-    score = 0
-    for s in state:
-        if s.endswith('_has_pickaxe') and state[s] == False:
-            score += 1
-        if s.endswith('_has_sword') and state[s] == False:
-            score += 1
-    return score
-
-def h2(state, goal):
+def h1(state, goal):
     score = 0
     for g in goal:
         if g.endswith('_at'):
             score += dist(state[g], goal[g], state)
+            continue
     return score
 
 world1 = create_world({'player'}, {'spider'}, {'forest','cave','dungeon'})
@@ -168,75 +164,42 @@ problem1 = Planning_problem(world1,
                              has_stone('player'):False, has_wood('player'):False, has_pickaxe('player'):False, has_sword('player'):False}, #initial state
                              {at('player'):'dungeon'}) #goal
 
-locations = {'forest','cave','dungeon','field','mountain','tower'}
+locations = {'forest','cave','dungeon','field','mountain','tower','castle'}
 world2 = create_world({'player1', 'player2'}, {'spider', 'zombie', 'skeleton'}, locations)
-borders2 = borders_helper(locations, {('forest','cave'),('cave','dungeon'),('forest','field'),('field','mountain'),('mountain','tower'),('cave','mountain')})
+borders2 = borders_helper(locations, {('forest','cave'),('cave','dungeon'),('forest','field'),('field','mountain'),('mountain','tower'),('cave','mountain'),('castle','field')})
 problem2 = Planning_problem(world2,
                             {at('player1'):'forest', at('player2'):'field', at('spider'):'dungeon', at('zombie'):'mountain', at('skeleton'):'tower',
                              **borders2,
-                             guarded('forest'):False, guarded('cave'):False, guarded('dungeon'):True, guarded('field'):False, guarded('mountain'):True, guarded('tower'):True,
+                             guarded('forest'):False, guarded('cave'):False, guarded('dungeon'):True, guarded('field'):False, guarded('mountain'):True, guarded('tower'):True, guarded('castle'):False,
                              **locations_stone_helper(locations, {'cave','mountain'}), **locations_wood_helper(locations, {'forest'}),
                              has_stone('player1'):False, has_wood('player1'):False, has_pickaxe('player1'):False, has_sword('player1'):False,
                              has_stone('player2'):False, has_wood('player2'):False, has_pickaxe('player2'):False, has_sword('player2'):False},
-                            {at('player1'):'dungeon', at('player2'):'tower'})
-
-locations3 = {'forest', 'cave', 'dungeon', 'field', 'mountain', 'tower', 'lake', 'village', 'castle', 'desert'}
-world3 = create_world({'player1', 'player2', 'player3'}, {'spider', 'zombie', 'skeleton', 'dragon'}, locations3)
-borders3 = borders_helper(locations3, {
-    ('forest', 'cave'), ('cave', 'dungeon'), ('forest', 'field'), ('field', 'mountain'), 
-    ('mountain', 'tower'), ('cave', 'mountain'), ('lake', 'village'), ('village', 'castle'), 
-    ('castle', 'desert'), ('field', 'lake'), ('mountain', 'desert')
-})
-problem3 = Planning_problem(world3,
-                            {at('player1'):'forest', at('player2'):'field', at('player3'):'village',
-                             at('spider'):'dungeon', at('zombie'):'mountain', at('skeleton'):'tower', at('dragon'):'castle',
-                             **borders3,
-                             guarded('forest'):False, guarded('cave'):False, guarded('dungeon'):True, guarded('field'):False,
-                             guarded('mountain'):True, guarded('tower'):True, guarded('lake'):False, guarded('village'):False,
-                             guarded('castle'):True, guarded('desert'):True,
-                             **locations_stone_helper(locations3, {'cave', 'mountain', 'desert'}),
-                             **locations_wood_helper(locations3, {'forest', 'village'}),
-                             has_stone('player1'):False, has_wood('player1'):False, has_pickaxe('player1'):False, has_sword('player1'):False,
-                             has_stone('player2'):False, has_wood('player2'):False, has_pickaxe('player2'):False, has_sword('player2'):False,
-                             has_stone('player3'):False, has_wood('player3'):False, has_pickaxe('player3'):False, has_sword('player3'):False},
-                            {at('player1'):'dungeon', at('player2'):'tower', at('player3'):'castle'})
+                            {at('player1'):'castle', at('player2'):'castle'})
                              
-print("\n***** FORWARD NO HEURISTIC")
+print("\n***** PROBLEM 2")
+print("\nNo Heuristic")
+start_time = time.time()
+state = forward_noheuristic(problem2)
+
+problem2b = Planning_problem(world2, state, {at('player1'):'dungeon', at('player2'):'forest'})
+state = forward_noheuristic(problem2b)
+
+problem2c = Planning_problem(world2, state, {at('player1'):'tower', at('player2'):'tower'})
+forward_noheuristic(problem2c)
+
+end_time = time.time()
+print(f"Execution time: {end_time - start_time:.2f} seconds")
+
+print("\nHeuristic")
 
 start_time = time.time()
-print("\nProblem 1")
-forward_noheuristic(problem1)
-end_time = time.time()
-print(f"Execution time: {end_time - start_time} seconds")
+state = forward_heuristic(problem2, h1)
 
-start_time = time.time()
-print("\nProblem 2")
-forward_noheuristic(problem2)
-end_time = time.time()
-print(f"Execution time: {end_time - start_time} seconds")
+problem2b = Planning_problem(world2, state, {at('player1'):'dungeon', at('player2'):'forest'})
+state = forward_heuristic(problem2b, h1)
 
-start_time = time.time()
-print("\nProblem 3")
-forward_noheuristic(problem3) # can take about 5 minutes
-end_time = time.time()
-print(f"Execution time: {end_time - start_time} seconds")
+problem2c = Planning_problem(world2, state, {at('player1'):'tower', at('player2'):'tower'})
+forward_heuristic(problem2c, h1)
 
-
-print("\n***** FORWARD HEURISTIC")
-print("\nProblem 1")
-start_time = time.time()
-forward_heuristic(problem1, h2)
 end_time = time.time()
-print(f"Execution time: {end_time - start_time} seconds")
-
-print("\nProblem 2")
-start_time = time.time()
-forward_heuristic(problem2, h2)
-end_time = time.time()
-print(f"Execution time: {end_time - start_time} seconds")
-
-print("\nProblem 3")
-start_time = time.time()
-forward_heuristic(problem3, h2)
-end_time = time.time()
-print(f"Execution time: {end_time - start_time} seconds")
+print(f"Execution time: {end_time - start_time:.2f} seconds")
