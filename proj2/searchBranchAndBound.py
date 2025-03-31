@@ -52,21 +52,4 @@ class DF_branch_and_bound(Searcher):
                               else "No solution found.",
                          f"Number of paths expanded: {self.num_expanded}.")
         return self.best_path
-        
-from searchGeneric import test
-if __name__ == "__main__":
-    test(DF_branch_and_bound)
-
-# Example queries:
-import searchExample
-# searcherb1 = DF_branch_and_bound(searchExample.simp_delivery_graph)
-# searcherb1.search()        # find optimal path
-# searcherb2 = DF_branch_and_bound(searchExample.cyclic_simp_delivery_graph, bound=100)
-# searcherb2.search()        # find optimal path
-
-# to use the GUI do:
-# ipython -i searchGUI.py
-# import searchBranchAndBound
-# SearcherGUI(searchBranchAndBound.DF_branch_and_bound, searchExample.simp_delivery_graph)
-# SearcherGUI(searchBranchAndBound.DF_branch_and_bound, searchExample.cyclic_simp_delivery_graph)
 

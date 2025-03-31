@@ -45,16 +45,3 @@ class SearcherMPP(AStarSearcher):
         self.display(0,"No (more) solutions. Total of",
                      self.num_expanded,"paths expanded.")
 
-from searchGeneric import test
-if __name__ == "__main__":
-    test(SearcherMPP)
-
-import searchExample
-# searcherMPPcdp = SearcherMPP(searchExample.cyclic_simp_delivery_graph)
-# searcherMPPcdp.search()  # find first path
-
-# To use the GUI for SearcherMPP do
-# python -i searchGUI.py
-# import searchMPP
-# SearcherGUI(searchMPP.SearcherMPP, searchExample.cyclic_simp_delivery_graph)
-
