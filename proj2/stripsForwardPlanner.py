@@ -9,7 +9,6 @@
 # See: https://creativecommons.org/licenses/by-nc-sa/4.0/deed.en
 
 from searchProblem import Arc, Search_problem
-from stripsProblem import Strips, STRIPS_domain
 
 class State(object):
     def __init__(self,assignment):
@@ -80,14 +79,3 @@ class Forward_STRIPS(Search_problem):
         of going from the state to the top-level goal.
         """
         return self.heur(state.assignment, self.goal)
-
-from searchBranchAndBound import DF_branch_and_bound
-from searchMPP import SearcherMPP
-import stripsProblem
-
-# SearcherMPP(Forward_STRIPS(stripsProblem.problem1)).search()  #A* with MPP
-# DF_branch_and_bound(Forward_STRIPS(stripsProblem.problem1),10).search() #B&B
-# To find more than one plan:
-# s1 = SearcherMPP(Forward_STRIPS(stripsProblem.problem1))  #A*
-# s1.search()  #find another plan
-
